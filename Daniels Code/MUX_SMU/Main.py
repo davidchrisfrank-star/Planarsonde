@@ -1,0 +1,32 @@
+from MUX import Multiplexer
+from SMU import SMU
+import matplotlib
+from datetime import datetime
+import csv
+import time
+
+if __name__ == "__main__":
+    VISA_ADDRESS = input("VISA-Addresse des MUX: ").strip()
+    mux = Multiplexer(VISA_ADDRESS)
+    print("Schritt 1: ABus an Bank 1/2 anschließen.")
+    time.sleep(0.5)
+    ABus = input("Welchen Kanal willst du schließen? (Bspw. 1911): ").strip()
+    mux.close_channel(ABus)
+    time.sleep(0.5)
+
+    print("Schritt 2: Kanal der Sonde schließen")
+    channel = input("Welchen Kanal willst du messen? (Bspw (1001): ")
+    mux.close_channel(channel)
+
+    time.sleep(1000)
+
+    close = input("Willst du den Kanal öffnen? (j/n)")
+    if close == "j":
+        mux.open_channel(channel)
+
+
+    time.sleep(1)
+
+    print("Kanal der Sonde schließen")
+    channel = input("Welchen Kanal willst du messen? (Bspw (1002): ")
+    mux.close_channel(channel)
