@@ -1,0 +1,16 @@
+# Langmuir probe analysis results — 2026-06-01 15:10:26
+# Sweep config: {'v_start': -10.0, 'v_stop': 10.0, 'n_points': 1000, 'compliance_A': 0.1, 'nplc': 0.01, 'high_cap': False, 'remote_sense': False}
+parameter,value,unit,description
+V_fl,-0.0017731393,V,Floating potential
+V_p,8.979,V,Plasma potential
+T_e,8.2594707,eV,Electron temperature
+I_ion_sat,-4.8933761e-09,A,Ion saturation current
+I_e_sat,8.8544136e-06,A,Electron saturation current
+I_ion_sat_mA,-4.8933761e-06,mA,Ion saturation current
+I_e_sat_mA,0.0088544136,mA,Electron saturation current
+ion_fit_slope,9.8562617e-07,A/V,Ion saturation fit slope
+ion_fit_intercept,-3.1457236e-09,A,Ion saturation fit intercept
+esat_fit_slope,9.8925874e-07,A/V,Electron saturation fit slope
+esat_fit_intercept,-2.8140565e-08,A,Electron saturation fit intercept
+Te_fit_slope,0.12107313,eV^-1,ln(Ie) fit slope = 1/T_e
+Te_fit_intercept,-19.601808,,ln(Ie) fit intercept
