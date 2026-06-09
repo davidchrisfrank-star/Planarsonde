@@ -174,6 +174,7 @@ class KeysightSMU:
         self.instrument.write(f":SOUR:VOLT {voltage}")
 
     def measure_current(self):
+        """Liest den aktuellen Ist-Strom von der SMU aus (Gesamtstrom)."""
         if self.simulate:
             return 5e-6 
         res = self.instrument.query(":MEAS:CURR?")
@@ -331,8 +332,8 @@ def save_to_csv(data, filename, mode_label):
     try:
         with open(filename, mode='w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            # Spaltenstruktur um Real-Spannung erweitert
-            writer.writerow(["Zeitstempel_PC", "DMM_Zeit_Rel_S", "Spannung_Soll_V", "Spannung_Ist_V", "Strom_Ist_A", "Modus"])
+            # Spaltenstruktur um "Strom_SMU_A" erweitert
+            writer.writerow(["Zeitstempel_PC", "DMM_Zeit_Rel_S", "Spannung_Soll_V", "Spannung_Ist_V", "Strom_Ist_A", "Strom_SMU_A", "Modus"])
             writer.writerows(data)
         print(f"[ERFOLG] Daten erfolgreich gespeichert unter: {filename}")
     except Exception as e:
@@ -362,12 +363,12 @@ def modus_1_einfache_sonde(mux, smu, alle_kanaele):
             smu.set_voltage(u_soll)
             time.sleep(0.01) 
             
-            # Live-Werte von der SMU abholen
             i_ist = smu.measure_current()
             u_ist = smu.measure_voltage()
             
             zeit = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-            messdaten.append([zeit, 0.0, u_soll, u_ist, i_ist, "Einfache Sonde"])
+            # Modus 1 nutzt nur SMU-Werte (Strom_Ist_A und Strom_SMU_A sind hier identisch)
+            messdaten.append([zeit, 0.0, u_soll, u_ist, i_ist, i_ist, "Einfache Sonde"])
             print(".", end="", flush=True)
             
     finally:
@@ -409,16 +410,19 @@ def modus_2_guardring_sonde(mux, smu, k_dmm, alle_kanaele):
             smu.set_voltage(u_soll)
             time.sleep(0.01) 
             
-            # 1. Stromwert vom Keithley abholen
+            # 1. Präzisen Plasmastrom der Platte vom Keithley holen
             i_platte, dmm_zeit_rel = k_dmm.read_current()
             
-            # 2. Exakte Ist-Spannung zeitgleich von der SMU abfragen
+            # 2. Exakte Ist-Spannung von der SMU abfragen
             u_ist = smu.measure_voltage()
+            
+            # 3. JETZT NEU: Den Gesamtstrom (Platte + Guardring) live von der SMU loggen
+            i_smu = smu.measure_current()
             
             zeit_pc = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             
-            # Beide Spannungswerte in der CSV speichern
-            messdaten.append([zeit_pc, dmm_zeit_rel, u_soll, u_ist, i_platte, "Guardring Sonde"])
+            # Alle Messwerte (Keithley-Strom und SMU-Strom) parallel sichern
+            messdaten.append([zeit_pc, dmm_zeit_rel, u_soll, u_ist, i_platte, i_smu, "Guardring Sonde"])
             print(".", end="", flush=True) 
             
     finally:
